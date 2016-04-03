@@ -28,7 +28,8 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/.. \
-                    $(LOCAL_PATH)/../.. \
+                    $(LOCAL_PATH)/../..  \
+                    $(LOCAL_PATH)/../../../external/google-play-games/include \
 
 LOCAL_EXPORT_LDLIBS := -lGLESv1_CM \
                        -lGLESv2 \

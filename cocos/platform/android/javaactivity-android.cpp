@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "network/CCDownloader-android.h"
 #include <android/log.h>
 #include <jni.h>
+#include "gpg/android_initialization.h"
 
 #define  LOG_TAG    "main"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -54,6 +55,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 {
     JniHelper::setJavaVM(vm);
 
+    gpg::AndroidInitialization::JNI_OnLoad(vm);
     cocos_android_app_init(JniHelper::getEnv());
 
     return JNI_VERSION_1_4;
