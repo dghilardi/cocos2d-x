@@ -37,9 +37,11 @@ THE SOFTWARE.
 #include "2d/CCDrawingPrimitives.h"
 #include "platform/android/jni/JniHelper.h"
 #include "network/CCDownloader-android.h"
+#include "AndroidMain.h"
 #include <android/log.h>
 #include <jni.h>
-#include "gpg/android_initialization.h"
+#include <gpg/android_initialization.h>
+#include <gpg/android_support.h>
 
 #define  LOG_TAG    "main"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -53,12 +55,60 @@ extern "C"
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 {
+    JNIEnv* env;
+
     JniHelper::setJavaVM(vm);
 
-    gpg::AndroidInitialization::JNI_OnLoad(vm);
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+       return -1;
+    }
+
+    AndroidMain::OnLoad(vm);
     cocos_android_app_init(JniHelper::getEnv());
 
-    return JNI_VERSION_1_4;
+    return JNI_VERSION_1_6;
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxActivity_nativeOnActivityCreated(JNIEnv* env, jobject thiz, jobject activity, jobject savedInstanceState) {
+      AndroidMain::NativeOnActivityCreated(env, activity, savedInstanceState);
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxActivity_nativeOnActivityResult
+    (JNIEnv* env, jobject thiz, jobject activity, jint request_code, jint result_code, jobject result) {
+
+    // Forward activity result to GPG
+    gpg::AndroidSupport::OnActivityResult(env, activity, request_code, result_code, result);
+
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxActivity_signIn
+    (JNIEnv* env, jobject thiz) {
+
+    StateManager::BeginUserInitiatedSignIn();
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxActivity_signOut
+    (JNIEnv* env, jobject thiz) {
+
+    StateManager::SignOut();
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxActivity_showAchievements
+  (JNIEnv *, jobject) {
+
+    StateManager::ShowAchievements();
+ }
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxActivity_showLeaderboards
+  (JNIEnv *, jobject) {
+
+    StateManager::GetGameServices()->Leaderboards().ShowAllUI();
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxActivity_setAuthResultCallback
+  (JNIEnv * env, jobject thiz, jstring callback) {
+
+    AndroidMain::SetAuthResultCallback(env, thiz, callback);
 }
 
 JNIEXPORT void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit(JNIEnv*  env, jobject thiz, jint w, jint h)
@@ -89,16 +139,16 @@ JNIEXPORT void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit(JNIEnv*  env, j
 
 JNIEXPORT jintArray Java_org_cocos2dx_lib_Cocos2dxActivity_getGLContextAttrs(JNIEnv*  env, jobject thiz)
 {
-    cocos2d::Application::getInstance()->initGLContextAttrs(); 
+    cocos2d::Application::getInstance()->initGLContextAttrs();
     GLContextAttrs _glContextAttrs = GLView::getGLContextAttrs();
-    
+
     int tmp[6] = {_glContextAttrs.redBits, _glContextAttrs.greenBits, _glContextAttrs.blueBits,
                            _glContextAttrs.alphaBits, _glContextAttrs.depthBits, _glContextAttrs.stencilBits};
 
 
     jintArray glContextAttrsJava = env->NewIntArray(6);
-        env->SetIntArrayRegion(glContextAttrsJava, 0, 6, tmp); 
-    
+        env->SetIntArrayRegion(glContextAttrsJava, 0, 6, tmp);
+
     return glContextAttrsJava;
 }
 
@@ -110,4 +160,3 @@ JNIEXPORT void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnSurfaceChanged(JNI
 }
 
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-

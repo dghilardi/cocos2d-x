@@ -214,6 +214,8 @@ navmesh/CCNavMeshAgent.cpp \
 navmesh/CCNavMeshDebugDraw.cpp \
 navmesh/CCNavMeshObstacle.cpp \
 navmesh/CCNavMeshUtils.cpp \
+gpgs/StateManager.cpp \
+AndroidMain.cpp \
 ../external/ConvertUTF/ConvertUTFWrapper.cpp \
 ../external/ConvertUTF/ConvertUTF.c \
 ../external/tinyxml2/tinyxml2.cpp \
@@ -244,7 +246,8 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/../external/poly2tri \
                     $(LOCAL_PATH)/../external/poly2tri/common \
                     $(LOCAL_PATH)/../external/poly2tri/sweep \
-                    $(LOCAL_PATH)/../external/clipper
+                    $(LOCAL_PATH)/../external/clipper \
+										$(LOCAL_PATH)/../external/google-play-games/include/android
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/platform \
@@ -259,11 +262,15 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/../external/poly2tri \
                     $(LOCAL_PATH)/../external/poly2tri/common \
                     $(LOCAL_PATH)/../external/poly2tri/sweep \
-                    $(LOCAL_PATH)/../external/clipper
+                    $(LOCAL_PATH)/../external/clipper \
+										$(LOCAL_PATH)/../external/google-play-games/include/android
 
 LOCAL_EXPORT_LDLIBS := -lGLESv2 \
                        -llog \
-                       -landroid
+                       -landroid \
+											 -latomic \
+											 -lEGL \
+											 -lz
 
 LOCAL_STATIC_LIBRARIES := cocos_freetype2_static
 LOCAL_STATIC_LIBRARIES += cocos_png_static
@@ -299,7 +306,7 @@ LOCAL_STATIC_LIBRARIES += cocos3d_static
 LOCAL_STATIC_LIBRARIES += spine_static
 LOCAL_STATIC_LIBRARIES += cocos_network_static
 LOCAL_STATIC_LIBRARIES += audioengine_static
-LOCAL_STATIC_LIBRARIES += gpg-1
+LOCAL_STATIC_LIBRARIES += google-play-games
 
 include $(BUILD_STATIC_LIBRARY)
 #==============================================================
@@ -325,4 +332,4 @@ $(call import-module,recast)
 # $(call import-module,curl/prebuilt/android)
 $(call import-module,websockets/prebuilt/android)
 $(call import-module,flatbuffers)
-$(call import-module,google-play-games)
+$(call import-module,google-play-games/prebuilt/android)
