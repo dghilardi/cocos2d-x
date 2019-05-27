@@ -13,3 +13,6 @@
 [submodule "external/protobuf-android"]
 	path = external/protobuf
 	url = https://github.com/julienr/protobuf-android.git
+[submodule "external/enet"]
+	path = external/enet
+	url = https://github.com/dghilardi/enet.git
